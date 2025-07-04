@@ -14,15 +14,23 @@ import React from "react";
  */
 function DrawingDisplay({ drawingData, width = 340, height = 220, debugProps }) {
   // Helper: Interpret when data may be present but invalid (empty string, wrong format, etc.)
-  // For drawingData, now accept any non-empty string as a valid image src (supports static URLs or data: URLs)
+  // Accepts any valid Webpack-provided static asset path or data URL as valid image source
   const isValidImageData = (data) =>
     typeof data === "string" &&
-    data.length > 8; // treat any reasonably non-trivial string as valid image path
+    !!data &&
+    (
+      // Accept Webpack static asset URLs (start with /static/, ./, or assets/, etc.)
+      /^\.?\/?(static|assets)?\/.+\.(png|jpg|jpeg|gif|svg)$/i.test(data) ||
+      // Accept data URLs (canvas export)
+      data.startsWith("data:image/")
+    );
 
   // Dev: print/log all critical info each render to console and visually (in guess mode)
-  console.log("[DEBUG-DrawingDisplay] drawingData snippet:", drawingData ? drawingData.substring(0, 48)+"..." : drawingData, 
+  // Show exact image src path for diagnosis
+  console.log("[DEBUG-DrawingDisplay] drawingData snippet:", drawingData ? drawingData.substring(0, 95)+"..." : drawingData, 
     "type:", typeof drawingData,
     "valid:", isValidImageData(drawingData),
+    "src:", drawingData,
     "extra debugProps:", debugProps);
 
   return (
@@ -49,7 +57,7 @@ function DrawingDisplay({ drawingData, width = 340, height = 220, debugProps }) 
         <div style={{
           position: "absolute",
           left: 8, top: 3, fontSize: 11, color: "#b04", opacity: 0.72,
-          zIndex: 2, fontFamily: "monospace", pointerEvents: "none", maxWidth: 260, wordBreak: "break-word"
+          zIndex: 2, fontFamily: "monospace", pointerEvents: "none", maxWidth: 300, wordBreak: "break-word", lineHeight: 1.12
         }}>
           <div style={{fontWeight:700}}>DEBUG</div>
           round: {debugProps.round} <br/>
@@ -58,7 +66,10 @@ function DrawingDisplay({ drawingData, width = 340, height = 220, debugProps }) 
           currentDrawing {debugProps.currentDrawing ? 
             `[len: ${debugProps.currentDrawing.length}]` : "null/empty"} <br/>
           currentWord: {String(debugProps.currentWord)}<br />
-          validImg: {isValidImageData(debugProps.currentDrawing) ? "yes" : "no"}
+          validImg: {isValidImageData(debugProps.currentDrawing) ? "yes" : "no"} <br/>
+          <span style={{fontSize:10, color:"#630"}}>
+            img src: {typeof debugProps.currentDrawing === "string" ? debugProps.currentDrawing : "(not a string)"}
+          </span>
         </div>
       )}
       {isValidImageData(drawingData) ? (
