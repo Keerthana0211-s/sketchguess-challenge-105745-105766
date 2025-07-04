@@ -1,1 +1,3 @@
-# sketchguess-challenge-105745-105766
+# Project Repository
+
+This is the initial README file for the project.
