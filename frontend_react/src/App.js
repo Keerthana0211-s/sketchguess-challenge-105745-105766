@@ -16,6 +16,7 @@ function App() {
 
   // Game state management
   const [mode, setMode] = useState('draw');            // 'draw' or 'guess'
+  // Score tracks correct and total rounds
   const [score, setScore] = useState({ correct: 0, total: 0 });
   const [round, setRound] = useState(1);
   const [loading, setLoading] = useState(false);
@@ -98,6 +99,12 @@ function App() {
   };
 
   // Handler stubs for game logic (expand as needed)
+  // PUBLIC_INTERFACE
+  /**
+   * Starts a new game (all rounds are reset, score returns to zero).
+   * @param {string} selectedMode - "draw" or "guess"
+   * Resets all round/score state.
+   */
   const startNewGame = async (selectedMode = 'draw') => {
     setMode(selectedMode);
     setScore({ correct: 0, total: 0 });
@@ -127,6 +134,14 @@ function App() {
     }
   };
 
+  // PUBLIC_INTERFACE
+  /**
+   * Call to end the current round and update the score based on result.
+   * @param {boolean} isCorrect - Whether the user's round result was correct.
+   * @param {string} msg        - Message to display in result modal.
+   * @param {string} answer     - The correct answer for display.
+   * This function guarantees score updates in lockstep with the UI modal.
+   */
   const handleRoundEnd = (isCorrect, msg, answer = '') => {
     setScore(s => ({
       correct: isCorrect ? s.correct + 1 : s.correct,
@@ -366,9 +381,10 @@ function App() {
         result={result}
         onClose={() => setModalOpen(false)}
         onNext={async () => {
+          // Proceed to the next round:
           setModalOpen(false);
           setResult(null);
-          setRound(r => r + 1);
+          setRound(r => r + 1); // increment round
 
           // Fetch next word/drawing for new round
           setLoading(true);
