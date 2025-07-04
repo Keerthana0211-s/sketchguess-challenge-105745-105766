@@ -46,17 +46,84 @@ function App() {
     setTheme(prev => prev === 'light' ? 'dark' : 'light');
   };
 
+  // === STUB/ASYNC MOCKS FOR WORD & DRAWING FETCHING ===
+
+  /**
+   * PUBLIC_INTERFACE
+   * Simulates fetching a random word for the drawing prompt.
+   * Returns a Promise that resolves to a word string after a short delay.
+   */
+  const fetchRandomWord = async () => {
+    const words = [
+      "apple", "cat", "house", "rocket", "guitar", "fish", "tree", "sun", "bicycle", "pizza",
+      "dog", "car", "book", "moon", "castle", "hat", "elephant", "cup", "star", "shoe"
+    ];
+    // Simulate network delay:
+    await new Promise(resolve => setTimeout(resolve, 360 + Math.random() * 480));
+    const randomWord = words[Math.floor(Math.random() * words.length)];
+    return randomWord;
+  };
+
+  /**
+   * PUBLIC_INTERFACE
+   * Simulates fetching a random drawing with its associated word.
+   * Returns a Promise that resolves to { drawingData, word } after a short delay.
+   * (For now: returns a hardcoded drawing for "apple", extendable for more samples.)
+   */
+  const fetchRandomDrawing = async () => {
+    // Array of dummy drawing assets. (Data URLs could also be fetched from a local list/assets).
+    const sampleDrawings = [
+      // Example: a simple base64 PNG for "apple", more can be added as string URLs or imported data.
+      {
+        word: "apple",
+        drawingData:
+          "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMgAAAB0CAYAAABaypQaAAABt0lEQVR42u3aoQ2AMBAF0e//5y0YkwuT8hQUkONkELWod93/CoFBoFA9X6/Uaj0ej0Wh0OhQKBQKBr6Z12/pdrutAhQAQAAAAAAAIBytyf80Q7bMY1wZDEpzk+xZPfZ/pn2nZnUZjUZXfmjlL2Ccx4/vggW/LZXK/vKqqiPx2xVL71GGovzG9wJ3/RZOdfi7XVQ9BjitUOtb8VacCTv7trFrDyuqCclUk6Q8u1QrFncvSkAl/5uA9XameTSkCXzlwDd9k9OGyQ/x5nK6pL6rhvK1wFYpXyjmig3A6YAs7VEvueEtP2Zcrnz4VbS4AtV7CEAAAAAAAAAQD79Ba4OlTH96e1tAAAAAElFTkSuQmCC"
+      },
+      {
+        word: "cat",
+        drawingData:
+          "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMgAAAB0CAYAAABaypQaAAAA/UlEQVR42u3VsQ2AIBDEQQn++4nKV1CETQCwlao78O0Ifb5uAoAAAAAAAAAACuTG/jb1VvTwGAkQHDtSdD9vOCHkXyK+mB8ZrxFaQTVlNd+ukR27QT+OmRLXwToTJrHgCjAeHEQDaxHk4hbEOEAJaAOENEAOEAJaAOENEAOEAJaAOENEAOEAJaAOENEAOEAJaAOENEAOEAJaAOENEAOEAJaAOEMQASHgHufJC8TFI6YAAAAASUVORK5CYII="
+      },
+      {
+        word: "sun",
+        drawingData:
+          "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMgAAAB0CAYAAABaypQaAAABCklEQVR42u3QQREAIAwAMdn/Uz+hdZaIzyNlaZFxd390CN+CgAAAAAAAAAAAAAAAPA+HWl3Cm5zjsjtH0e37CxThwnw+6nPBGfgN+4AfAIdgi+gjHrd6zjTIyAfKAX0IzAF+Qk8AHygF9CEwBfkIPAB8oBfQhMAX5CDwAfKAUU4MfoX7d2MTeyZXiP0AAAAASUVORK5CYII="
+      },
+      // Add more dummy drawings here as needed...
+    ];
+    await new Promise(resolve => setTimeout(resolve, 400 + Math.random() * 500));
+    const sample = sampleDrawings[Math.floor(Math.random() * sampleDrawings.length)];
+    return sample;
+  };
+
   // Handler stubs for game logic (expand as needed)
-  const startNewGame = (selectedMode = 'draw') => {
+  const startNewGame = async (selectedMode = 'draw') => {
     setMode(selectedMode);
     setScore({ correct: 0, total: 0 });
     setRound(1);
     setResult(null);
     setError('');
     setModalOpen(false);
-    // TODO: Fetch initial word/drawing based on mode
-    setCurrentWord('');
-    setCurrentDrawing(null);
+
+    // Fetch appropriate initial item for the selected mode
+    setLoading(true);
+    try {
+      if (selectedMode === 'draw') {
+        const word = await fetchRandomWord();
+        setCurrentWord(word);
+        setCurrentDrawing(null);
+      } else {
+        const { word, drawingData } = await fetchRandomDrawing();
+        setCurrentWord(word); // For validation
+        setCurrentDrawing(drawingData);
+      }
+    } catch (err) {
+      setError("Failed to fetch data. Please try again.");
+      setCurrentWord('');
+      setCurrentDrawing(null);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleRoundEnd = (isCorrect, msg, answer = '') => {
@@ -311,11 +378,30 @@ function App() {
             <button
               className="btn"
               style={{ marginTop: 12, minWidth: 120 }}
-              onClick={() => {
+              onClick={async () => {
                 setModalOpen(false);
                 setResult(null);
                 setRound(r => r + 1);
-                // TODO: Fetch next word/drawing here
+
+                // Fetch next word/drawing for new round
+                setLoading(true);
+                try {
+                  if (mode === "draw") {
+                    const word = await fetchRandomWord();
+                    setCurrentWord(word);
+                    setCurrentDrawing(null);
+                  } else {
+                    const { word, drawingData } = await fetchRandomDrawing();
+                    setCurrentWord(word);
+                    setCurrentDrawing(drawingData);
+                  }
+                } catch (err) {
+                  setError("Failed to fetch next round data.");
+                  setCurrentWord('');
+                  setCurrentDrawing(null);
+                } finally {
+                  setLoading(false);
+                }
               }}
               autoFocus
             >
