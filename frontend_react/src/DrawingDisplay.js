@@ -1,0 +1,66 @@
+import React from "react";
+
+/**
+ * PUBLIC_INTERFACE
+ * DrawingDisplay component for SketchSolo Guess Mode.
+ * 
+ * Shows the drawing to be guessed as an image, or a clear placeholder if there is no drawing.
+ * Ensures accessibility (role="img", alt text) and a modern minimal style per brand with fallback UI.
+ * 
+ * Props:
+ *   drawingData: string | null   // Base64 image string (data URL), or null/undefined for placeholder
+ *   width: number                // Pixel width (optional, default 340)
+ *   height: number               // Pixel height (optional, default 220)
+ */
+function DrawingDisplay({ drawingData, width = 340, height = 220 }) {
+  return (
+    <div
+      className="drawing-display-container"
+      style={{
+        width,
+        height,
+        minWidth: width,
+        minHeight: height,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        background: "var(--bg-secondary)",
+        border: "2.5px solid var(--primary)",
+        borderRadius: 14,
+        boxShadow: "0 1px 8px rgba(41,128,185,0.08)"
+      }}
+      aria-label={drawingData ? "Drawing to guess" : "No drawing available"}
+    >
+      {drawingData ? (
+        <img
+          src={drawingData}
+          alt="Drawing to guess"
+          style={{
+            width: "96%",
+            height: "96%",
+            objectFit: "contain",
+            borderRadius: 9,
+            boxShadow: "0 0.5px 4px rgba(41,128,185,0.06)"
+          }}
+        />
+      ) : (
+        <div
+          style={{
+            color: "#bbb",
+            textAlign: "center",
+            fontSize: 22,
+            width: "94%",
+            userSelect: "none"
+          }}
+        >
+          <span role="img" aria-label="Empty drawing">🖼️</span>
+          <div style={{fontSize: 15, marginTop: 9}}>
+            No drawing available<br/>Start a round to see a drawing!
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+export default DrawingDisplay;

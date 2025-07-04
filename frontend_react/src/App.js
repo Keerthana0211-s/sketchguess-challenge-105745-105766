@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
 import Canvas from './Canvas';
+import DrawingDisplay from './DrawingDisplay';
 
 // PUBLIC_INTERFACE
 /**
@@ -112,7 +113,7 @@ function App() {
           </div>
         )}
 
-        {/* GamePanel: Render Canvas in draw mode, or placeholder for guess mode */}
+        {/* GamePanel: Render Canvas in draw mode, or DrawingDisplay in guess mode */}
         <section>
           {mode === "draw" ? (
             <div style={{
@@ -133,15 +134,16 @@ function App() {
             </div>
           ) : (
             <div style={{
-              minHeight: 220,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              border: '1px solid var(--border-color)',
-              borderRadius: 12,
-              background: 'var(--bg-secondary)'
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center"
             }}>
-              <span style={{ color: '#bbb' }}>[Drawing display for guessing coming soon]</span>
+              {/* Drawing Display (guess mode) */}
+              <DrawingDisplay
+                drawingData={currentDrawing}
+                width={340}
+                height={220}
+              />
             </div>
           )}
         </section>
