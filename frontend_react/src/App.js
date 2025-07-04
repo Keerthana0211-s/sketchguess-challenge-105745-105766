@@ -12,6 +12,7 @@ import img4 from './assets/20250704_084813_Screenshot_2025-07-04_at_2.14.38_PM.p
 import img5 from './assets/20250704_084813_bear.png';
 import img6 from './assets/20250704_085053_Screenshot_2025-07-04_at_2.20.45_PM.png';
 import imgHelicopter from './assets/20250704_090053_Screenshot_2025-07-04_at_2.30.46_PM.png'; // Helicopter image for guess mode
+import imgHelicopter2 from './assets/20250704_091350_converted_image.png'; // New helicopter image
 
 // PUBLIC_INTERFACE
 /**
@@ -35,9 +36,10 @@ function App() {
 
   // === Guess mode mock image array/cycling logic ===
   // List of imported images and associated words for guess mode.
-  // The helicopter image is always the first shown in guess mode, so it is easy to check.
+  // The first helicopter image will be the new one just added for "helicopter" guess round.
   const mockGuessDrawings = useRef([
-    // Only include helicopter if file is not a corrupt stub (heuristic: length > 100 for valid React/Webpack PNG)
+    // Always show the newly provided helicopter image first for explicit round/word "helicopter"
+    { word: 'helicopter', drawingData: imgHelicopter2 },
     ...(typeof imgHelicopter === "string" && imgHelicopter.length > 100
       ? [{ word: 'helicopter', drawingData: imgHelicopter }]
       : []),
