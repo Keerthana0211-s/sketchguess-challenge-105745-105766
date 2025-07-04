@@ -14,10 +14,10 @@ import React from "react";
  */
 function DrawingDisplay({ drawingData, width = 340, height = 220, debugProps }) {
   // Helper: Interpret when data may be present but invalid (empty string, wrong format, etc.)
+  // For drawingData, now accept any non-empty string as a valid image src (supports static URLs or data: URLs)
   const isValidImageData = (data) =>
     typeof data === "string" &&
-    data.startsWith("data:image") &&
-    data.length > "data:image/png;base64,".length + 10; // crude size check
+    data.length > 8; // treat any reasonably non-trivial string as valid image path
 
   // Dev: print/log all critical info each render to console and visually (in guess mode)
   console.log("[DEBUG-DrawingDisplay] drawingData snippet:", drawingData ? drawingData.substring(0, 48)+"..." : drawingData, 
@@ -89,9 +89,6 @@ function DrawingDisplay({ drawingData, width = 340, height = 220, debugProps }) 
           <div style={{fontSize: 15, marginTop: 9}}>
             No drawing available<br />
             {drawingData === "" && <span>(Empty image)</span>}
-            {drawingData && typeof drawingData === "string" && !isValidImageData(drawingData) && (
-              <span style={{color:"#c44"}}>(Invalid image format!)</span>
-            )}
             <span style={{fontSize: 11, display: "block", marginTop: 3, color: "#aaa"}}>
               {/* Debug info: if drawingData present, show first N chars */}
               {drawingData && typeof drawingData === "string"

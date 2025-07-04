@@ -10,6 +10,7 @@ import img2 from './assets/20250704_084811_Screenshot_2025-07-04_at_2.17.00_PM.p
 import img3 from './assets/20250704_084812_Screenshot_2025-07-04_at_2.16.47_PM.png';
 import img4 from './assets/20250704_084813_Screenshot_2025-07-04_at_2.14.38_PM.png';
 import img5 from './assets/20250704_084813_bear.png';
+import img6 from './assets/20250704_085053_Screenshot_2025-07-04_at_2.20.45_PM.png';
 
 // PUBLIC_INTERFACE
 /**
@@ -38,7 +39,8 @@ function App() {
     { word: 'tiger', drawingData: img2 },
     { word: 'house', drawingData: img3 },
     { word: 'waterfall', drawingData: img4 },
-    { word: 'bear', drawingData: img5 }
+    { word: 'bear', drawingData: img5 },
+    { word: 'castle', drawingData: img6 }
   ]);
   // Tracks which image to present next (cycles with modulus)
   const guessImageIndex = useRef(0);
