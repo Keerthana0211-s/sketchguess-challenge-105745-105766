@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
+import Canvas from './Canvas';
 
 // PUBLIC_INTERFACE
 /**
@@ -111,19 +112,38 @@ function App() {
           </div>
         )}
 
-        {/* TODO: Insert GamePanel here (drawing canvas or drawing display) */}
+        {/* GamePanel: Render Canvas in draw mode, or placeholder for guess mode */}
         <section>
-          <div style={{
-            minHeight: 220,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            border: '1px solid var(--border-color)',
-            borderRadius: 12,
-            background: 'var(--bg-secondary)'
-          }}>
-            <span style={{ color: '#bbb' }}>[Game area placeholder]</span>
-          </div>
+          {mode === "draw" ? (
+            <div style={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center"
+            }}>
+              {/* Drawing Canvas (enabled) */}
+              <Canvas
+                width={340}
+                height={220}
+                disabled={false}
+                onChange={(dataUrl) => {
+                  // Data URL provided when drawing changes
+                  setCurrentDrawing(dataUrl);
+                }}
+              />
+            </div>
+          ) : (
+            <div style={{
+              minHeight: 220,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              border: '1px solid var(--border-color)',
+              borderRadius: 12,
+              background: 'var(--bg-secondary)'
+            }}>
+              <span style={{ color: '#bbb' }}>[Drawing display for guessing coming soon]</span>
+            </div>
+          )}
         </section>
 
         {/* TODO: Insert InputArea (prompt, input, submit button) */}
