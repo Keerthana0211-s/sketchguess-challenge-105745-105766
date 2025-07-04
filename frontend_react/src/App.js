@@ -252,6 +252,15 @@ function App() {
               justifyContent: "center",
               alignItems: "center"
             }}>
+              {/* Console log handoff for debugging */}
+              {(() => {
+                if (typeof window !== "undefined" && window.console) {
+                  window.console.log("[App->DrawingDisplay] About to pass to DrawingDisplay: currentDrawing:", currentDrawing, "type:", typeof currentDrawing);
+                  if (currentDrawing && typeof currentDrawing === "string") {
+                    window.console.log("[App->DrawingDisplay] currentDrawing (first 150 chars):", currentDrawing.slice(0,150));
+                  }
+                }
+              })()}
               {/* Drawing Display (guess mode) */}
               <DrawingDisplay
                 drawingData={currentDrawing}
@@ -266,6 +275,27 @@ function App() {
                   currentWord
                 }}
               />
+              {/* Extra on-screen debug: show actual img src and typeof */}
+              <div style={{
+                fontSize: 12,
+                color: "#1258a9",
+                marginLeft: 12,
+                background: "#e0f3fd",
+                border: "1.5px solid #3298d6",
+                borderRadius: 4,
+                padding: 7,
+                fontFamily: "monospace",
+                alignSelf: "flex-start",
+                maxWidth: 375,
+                wordBreak: "break-all"
+              }}>
+                <strong>IMG src</strong>:<br/>
+                {typeof currentDrawing === "string" ? currentDrawing : String(currentDrawing)}
+                <br/>
+                <strong>typeof</strong>: {typeof currentDrawing}
+                <br/>
+                <strong>length</strong>: {typeof currentDrawing === "string" && currentDrawing ? currentDrawing.length : 'N/A'}
+              </div>
               {(!currentDrawing || typeof currentDrawing !== "string") && (
                 <div style={{
                   color: "#d44", background: "#fffaf9", border: "2px dashed #ed6c02", marginTop: 14,

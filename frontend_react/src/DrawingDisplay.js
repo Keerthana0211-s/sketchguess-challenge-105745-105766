@@ -23,22 +23,29 @@ function DrawingDisplay({ drawingData, width = 340, height = 220, debugProps }) 
       // Accept compiled Create React App "/static/media/..." URLs
       /^\/static\/media\/.+\.(png|jpg|jpeg|gif|svg)(\?hash=[a-zA-Z0-9]+)?$/i.test(data) ||
       // Accept data URLs (canvas export)
-      data.startsWith("data:image/")
+      data.startsWith("data:image/") ||
+      // Accept localhost relative paths (useful for dev asset src in create-react-app)
+      /^\/assets\/.+\.(png|jpg|jpeg|gif|svg)$/i.test(data)
     );
 
-  // Always log for debugging and show visually
+  // Enhanced debug for troubleshooting image source issue
   if (typeof window !== "undefined" && window.console) {
+    // eslint-disable-next-line
     console.log(
-      "[DEBUG-DrawingDisplay] drawingData:",
-      drawingData,
-      "type:", typeof drawingData,
-      "length:", drawingData && typeof drawingData === "string" ? drawingData.length : undefined,
-      "valid:", isValidImageData(drawingData),
-      "src:", drawingData,
-      "extra debugProps:", debugProps
+      "[DEBUG-DrawingDisplay-FULL] drawingData:", drawingData,
+      "\n - type:", typeof drawingData,
+      "\n - length:", drawingData && typeof drawingData === "string" ? drawingData.length : undefined,
+      "\n - isValidImageData:", isValidImageData(drawingData),
+      "\n - src (for <img>):", drawingData,
+      "\n - debugProps:", debugProps,
+      "\n - window.location:", window && window.location ? window.location.href : undefined
     );
+    if (debugProps && typeof drawingData === "string" && !isValidImageData(drawingData)) {
+      window.console.warn("[DrawingDisplay] Image src not recognized as valid image, check pipeline and asset delivery:", drawingData);
+    }
   }
 
+  // Show full prop dump and data overlay for debugging
   return (
     <div
       className="drawing-display-container"
@@ -51,7 +58,7 @@ function DrawingDisplay({ drawingData, width = 340, height = 220, debugProps }) 
         alignItems: "center",
         justifyContent: "center",
         background: "var(--bg-secondary)",
-        border: "4px solid #f39c12", // accent border for debug tracing
+        border: "4px solid #f39c12",
         borderRadius: 14,
         boxShadow: "0 1px 8px rgba(41,128,185,0.15)",
         position: "relative",
@@ -59,29 +66,54 @@ function DrawingDisplay({ drawingData, width = 340, height = 220, debugProps }) 
         boxSizing: "border-box"
       }}
       aria-label={isValidImageData(drawingData) ? "Drawing to guess" : "No drawing available"}
-      data-debug-src={drawingData && typeof drawingData === "string" ? drawingData.slice(0,20)+'...' : "null"}
+      data-debug-src={drawingData && typeof drawingData === "string" ? drawingData.slice(0,40)+'...' : "null"}
     >
-      {/* On-screen debug info for guess mode */}
+      {/* Dev/Debug: WIDER Property Dump + actual src display for diagnosis */}
+      <div style={{
+        position: "absolute",
+        left: 8, top: 3, fontSize: 12, color: "#1e36ad", background: "#fff4c6", border: "1.3px solid #ded0a6",
+        zIndex: 30, fontFamily: "monospace", pointerEvents: "none", maxWidth: 495, wordBreak: "break-all", lineHeight: 1.15,
+        borderRadius: 5, padding: 7, opacity: 0.98, boxShadow: "0 2px 7px #dbe6f8"
+      }}>
+        <strong>DrawDisp Debug</strong> <br />
+        <span>drawData type: <b>{typeof drawingData}</b> &nbsp; | &nbsp; len: <b>{drawingData && typeof drawingData === "string" ? drawingData.length : "N/A"}</b></span><br />
+        <span>img src:<br />
+          <span style={{ color:"#2732af", wordBreak:"break-all", fontSize:"12px"}}>
+            {typeof drawingData === "string"
+              ? drawingData.slice(0, 320) + (drawingData.length > 320 ? "...(trunc)" : "")
+              : String(drawingData)}
+          </span>
+        </span>
+        <br />
+        <span>isValidImg: <b>{isValidImageData(drawingData) ? "yes" : "no"}</b></span><br />
+        <span>window.loc:
+          <span style={{ color:"#438" }}>
+            {typeof window !== "undefined" && window.location ? ` ${window.location.pathname}` : ""}
+          </span>
+        </span>
+        <br/>
+        <span>Other props:<br/>
+          {JSON.stringify(debugProps)}
+        </span>
+      </div>
+      {/* On-screen original debug info */}
       {debugProps && (
         <div style={{
           position: "absolute",
-          left: 8, top: 3, fontSize: 12, color: "#b04", opacity: 0.87,
-          zIndex: 3, fontFamily: "monospace", pointerEvents: "none", maxWidth: 420, wordBreak: "break-word", lineHeight: 1.14,
-          background: "#fffbe8", border: "1.5px solid #f39c12", borderRadius: 3, padding: 6
+          right: 8, bottom: 3, fontSize: 12, color: "#b04", opacity: 0.87,
+          zIndex: 3, fontFamily: "monospace", pointerEvents: "none", maxWidth: 320, wordBreak: "break-word", lineHeight: 1.14,
+          background: "#fffbe8", border: "1.5px solid #f39c12", borderRadius: 3, padding: 4
         }}>
           <div style={{fontWeight:900, fontSize:13, color:"#e87a41"}}>DEBUG</div>
           round: {debugProps.round} <br/>
           loading: {debugProps.loading ? "T" : "F"} <br/>
           error: {debugProps.error ? debugProps.error : "-"} <br/>
-          drawingData: {typeof drawingData === "string" ? `[${drawingData.slice(0,32)}${drawingData.length>32?"...":""}]` : String(drawingData)} <br/>
+          drawData: {typeof drawingData === "string" ? `[${drawingData.slice(0,32)}${drawingData.length>32?"...":""}]` : String(drawingData)} <br/>
           currentDrawing: {debugProps.currentDrawing && typeof debugProps.currentDrawing === "string"
             ? `[len:${debugProps.currentDrawing.length}]`
             : String(debugProps.currentDrawing)} <br/>
           currentWord: {String(debugProps.currentWord)} <br/>
           validImg: {isValidImageData(drawingData) ? "yes" : "no"} <br/>
-          <span style={{fontSize:10, color:"#630"}}>
-            img src: {typeof drawingData === "string" ? drawingData : "(not a string)"}
-          </span>
         </div>
       )}
       {isValidImageData(drawingData) ? (
@@ -95,7 +127,7 @@ function DrawingDisplay({ drawingData, width = 340, height = 220, debugProps }) 
               height: "96%",
               objectFit: "contain",
               borderRadius: 11,
-              boxShadow: "0 0.5px 8px 2px #f39c12, 0 0.5px 4px rgba(41,128,185,0.10)", // shadow for visibility
+              boxShadow: "0 0.5px 8px 2px #f39c12, 0 0.5px 4px rgba(41,128,185,0.10)",
               zIndex: 2,
               outline: "2.5px solid #27ae60"
             }}
@@ -107,16 +139,6 @@ function DrawingDisplay({ drawingData, width = 340, height = 220, debugProps }) 
               if (window && window.console) window.console.error("[DrawingDisplay] Failed image load", drawingData);
             }}
           />
-          <div style={{ fontSize: 12, marginTop: 6, color: "#ad730a", wordBreak: "break-all", opacity: 0.92 }}>
-            <strong>src:</strong>{" "}
-            <span style={{color:"#2980b9"}}>
-              {typeof drawingData === "string"
-                ? drawingData.slice(0, 128) + (drawingData.length > 128 ? "..." : "")
-                : "(not a string)"}
-            </span>
-            <br />
-            <span>valid: {isValidImageData(drawingData) ? "yes" : "no"}</span>
-          </div>
         </>
       ) : (
         <div
