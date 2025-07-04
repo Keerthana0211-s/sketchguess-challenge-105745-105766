@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import './App.css';
 import Canvas from './Canvas';
 import DrawingDisplay from './DrawingDisplay';
+import ResultModal from './ResultModal';
 
 // PUBLIC_INTERFACE
 /**
@@ -359,84 +360,37 @@ function App() {
         </section>
       </main>
 
-      {/* Result Modal / Section */}
-      {modalOpen && result && (
-        <div
-          className="modal-overlay"
-          role="dialog"
-          aria-modal="true"
-          style={{
-            position: 'fixed',
-            left: 0,
-            top: 0,
-            width: '100vw',
-            height: '100vh',
-            background: 'rgba(0,0,0,0.12)',
-            zIndex: 1000,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center'
-          }}
-          onClick={() => setModalOpen(false)}
-        >
-          <div
-            className="modal-content"
-            style={{
-              background: 'var(--bg-primary)',
-              borderRadius: 20,
-              padding: '2rem 2.5rem',
-              minWidth: 320,
-              boxShadow: '0 4px 24px rgba(0,0,0,0.1)',
-              textAlign: 'center'
-            }}
-            onClick={e => e.stopPropagation()}
-          >
-            <h2 style={{ color: result.correct ? '#27ae60' : '#2980b9', marginBottom: 15 }}>
-              {result.correct ? "🎉 Correct!" : "❌ Try Again!"}
-            </h2>
-            <div style={{ marginBottom: 10 }}>
-              {result.msg}
-            </div>
-            {result.answer && (
-              <div style={{ fontSize: 18, marginBottom: 10 }}>
-                <strong>Answer:</strong> {result.answer}
-              </div>
-            )}
-            <button
-              className="btn"
-              style={{ marginTop: 12, minWidth: 120 }}
-              onClick={async () => {
-                setModalOpen(false);
-                setResult(null);
-                setRound(r => r + 1);
+      {/* Result Modal */}
+      <ResultModal
+        open={modalOpen}
+        result={result}
+        onClose={() => setModalOpen(false)}
+        onNext={async () => {
+          setModalOpen(false);
+          setResult(null);
+          setRound(r => r + 1);
 
-                // Fetch next word/drawing for new round
-                setLoading(true);
-                try {
-                  if (mode === "draw") {
-                    const word = await fetchRandomWord();
-                    setCurrentWord(word);
-                    setCurrentDrawing(null);
-                  } else {
-                    const { word, drawingData } = await fetchRandomDrawing();
-                    setCurrentWord(word);
-                    setCurrentDrawing(drawingData);
-                  }
-                } catch (err) {
-                  setError("Failed to fetch next round data.");
-                  setCurrentWord('');
-                  setCurrentDrawing(null);
-                } finally {
-                  setLoading(false);
-                }
-              }}
-              autoFocus
-            >
-              Next Round
-            </button>
-          </div>
-        </div>
-      )}
+          // Fetch next word/drawing for new round
+          setLoading(true);
+          try {
+            if (mode === "draw") {
+              const word = await fetchRandomWord();
+              setCurrentWord(word);
+              setCurrentDrawing(null);
+            } else {
+              const { word, drawingData } = await fetchRandomDrawing();
+              setCurrentWord(word);
+              setCurrentDrawing(drawingData);
+            }
+          } catch (err) {
+            setError("Failed to fetch next round data.");
+            setCurrentWord('');
+            setCurrentDrawing(null);
+          } finally {
+            setLoading(false);
+          }
+        }}
+      />
 
       {/* Footer (optional) */}
       <footer style={{ margin: '32px 0 10px', fontSize: 13, color: '#888' }}>
