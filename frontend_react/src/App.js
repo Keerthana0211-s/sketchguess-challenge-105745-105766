@@ -11,8 +11,7 @@ import img3 from './assets/20250704_084812_Screenshot_2025-07-04_at_2.16.47_PM.p
 import img4 from './assets/20250704_084813_Screenshot_2025-07-04_at_2.14.38_PM.png';
 import img5 from './assets/20250704_084813_bear.png';
 import img6 from './assets/20250704_085053_Screenshot_2025-07-04_at_2.20.45_PM.png';
-// Inserted: import helicopter image with the correct new asset from src/assets
-import imgHelicopter from './assets/20250704_090053_Screenshot_2025-07-04_at_2.30.46_PM.png';
+import imgHelicopter from './assets/20250704_090053_Screenshot_2025-07-04_at_2.30.46_PM.png'; // Helicopter image for guess mode
 
 // PUBLIC_INTERFACE
 /**
@@ -35,11 +34,10 @@ function App() {
   const [modalOpen, setModalOpen] = useState(false);
 
   // === Guess mode mock image array/cycling logic ===
-  // List of imported images and associated words for stub guess mode. Edit words if you wish.
-  // Insert new helicopter image as the first item to guarantee it's the first drawing in guess mode.
+  // List of imported images and associated words for guess mode.
+  // The helicopter image is always the first shown in guess mode, so it is easy to check.
   const mockGuessDrawings = useRef([
-    // Corrected: Set the helicopter image import to use the new file and guarantee correct answer/asset association
-    { word: 'helicopter', drawingData: imgHelicopter },
+    { word: 'helicopter', drawingData: imgHelicopter }, // This is the new helicopter image and correct answer
     { word: 'lion', drawingData: img1 },
     { word: 'tiger', drawingData: img2 },
     { word: 'house', drawingData: img3 },
