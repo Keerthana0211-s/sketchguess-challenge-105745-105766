@@ -1,8 +1,15 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import './App.css';
 import Canvas from './Canvas';
 import DrawingDisplay from './DrawingDisplay';
 import ResultModal from './ResultModal';
+
+// Import attached drawings for guess mode
+import img1 from './assets/20250704_084811_Screenshot_2025-07-04_at_2.17.38_PM.png';
+import img2 from './assets/20250704_084811_Screenshot_2025-07-04_at_2.17.00_PM.png';
+import img3 from './assets/20250704_084812_Screenshot_2025-07-04_at_2.16.47_PM.png';
+import img4 from './assets/20250704_084813_Screenshot_2025-07-04_at_2.14.38_PM.png';
+import img5 from './assets/20250704_084813_bear.png';
 
 // PUBLIC_INTERFACE
 /**
@@ -23,6 +30,18 @@ function App() {
   const [error, setError] = useState('');
   const [result, setResult] = useState(null);           // { correct: true/false, msg: string, answer: string }
   const [modalOpen, setModalOpen] = useState(false);
+
+  // === Guess mode mock image array/cycling logic ===
+  // List of imported images and associated words for stub guess mode. Edit words if you wish.
+  const mockGuessDrawings = useRef([
+    { word: 'lion', drawingData: img1 },
+    { word: 'tiger', drawingData: img2 },
+    { word: 'house', drawingData: img3 },
+    { word: 'waterfall', drawingData: img4 },
+    { word: 'bear', drawingData: img5 }
+  ]);
+  // Tracks which image to present next (cycles with modulus)
+  const guessImageIndex = useRef(0);
 
   // Game data
   const [currentWord, setCurrentWord] = useState('');           // word to draw, or correct answer for guess mode
@@ -48,7 +67,7 @@ function App() {
     setTheme(prev => prev === 'light' ? 'dark' : 'light');
   };
 
-  // === STUB/ASYNC MOCKS FOR WORD & DRAWING FETCHING ===
+  // === WORD AND DRAWING FETCH LOGIC ===
 
   /**
    * PUBLIC_INTERFACE
@@ -68,35 +87,17 @@ function App() {
 
   /**
    * PUBLIC_INTERFACE
-   * Simulates fetching a random drawing with its associated word.
-   * Returns a Promise that resolves to { drawingData, word } after a short delay.
-   * (For now: returns a hardcoded drawing for "apple", extendable for more samples.)
+   * Returns the next image/word from the mockGuessDrawings list, cycling after the last one.
+   * Each call advances the index for the next round in guess mode.
    */
   const fetchRandomDrawing = async () => {
-    // Array of dummy drawing assets. (Data URLs could also be fetched from a local list/assets).
-    const sampleDrawings = [
-      // Example: a simple base64 PNG for "apple", more can be added as string URLs or imported data.
-      {
-        word: "apple",
-        drawingData:
-          "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMgAAAB0CAYAAABaypQaAAABt0lEQVR42u3aoQ2AMBAF0e//5y0YkwuT8hQUkONkELWod93/CoFBoFA9X6/Uaj0ej0Wh0OhQKBQKBr6Z12/pdrutAhQAQAAAAAAAIBytyf80Q7bMY1wZDEpzk+xZPfZ/pn2nZnUZjUZXfmjlL2Ccx4/vggW/LZXK/vKqqiPx2xVL71GGovzG9wJ3/RZOdfi7XVQ9BjitUOtb8VacCTv7trFrDyuqCclUk6Q8u1QrFncvSkAl/5uA9XameTSkCXzlwDd9k9OGyQ/x5nK6pL6rhvK1wFYpXyjmig3A6YAs7VEvueEtP2Zcrnz4VbS4AtV7CEAAAAAAAAAQD79Ba4OlTH96e1tAAAAAElFTkSuQmCC"
-      },
-      {
-        word: "cat",
-        drawingData:
-          "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMgAAAB0CAYAAABaypQaAAAA/UlEQVR42u3VsQ2AIBDEQQn++4nKV1CETQCwlao78O0Ifb5uAoAAAAAAAAAACuTG/jb1VvTwGAkQHDtSdD9vOCHkXyK+mB8ZrxFaQTVlNd+ukR27QT+OmRLXwToTJrHgCjAeHEQDaxHk4hbEOEAJaAOENEAOEAJaAOENEAOEAJaAOENEAOEAJaAOENEAOEAJaAOENEAOEAJaAOENEAOEAJaAOEMQASHgHufJC8TFI6YAAAAASUVORK5CYII="
-      },
-      {
-        word: "sun",
-        drawingData:
-          "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMgAAAB0CAYAAABaypQaAAABCklEQVR42u3QQREAIAwAMdn/Uz+hdZaIzyNlaZFxd390CN+CgAAAAAAAAAAAAAAAPA+HWl3Cm5zjsjtH0e37CxThwnw+6nPBGfgN+4AfAIdgi+gjHrd6zjTIyAfKAX0IzAF+Qk8AHygF9CEwBfkIPAB8oBfQhMAX5CDwAfKAUU4MfoX7d2MTeyZXiP0AAAAASUVORK5CYII="
-      },
-      // Add more dummy drawings here as needed...
-    ];
-    await new Promise(resolve => setTimeout(resolve, 400 + Math.random() * 500));
-    const sample = sampleDrawings[Math.floor(Math.random() * sampleDrawings.length)];
-    console.log("[DEBUG-fetchRandomDrawing] Returning sample:", sample);
-    return sample;
+    await new Promise(resolve => setTimeout(resolve, 200 + Math.random() * 200));
+    const arr = mockGuessDrawings.current;
+    const idx = guessImageIndex.current % arr.length;
+    const selected = arr[idx];
+    // Advance for next round
+    guessImageIndex.current = (guessImageIndex.current + 1) % arr.length;
+    return { ...selected };
   };
 
   // Handler stubs for game logic (expand as needed)
@@ -104,7 +105,7 @@ function App() {
   /**
    * Starts a new game (all rounds are reset, score returns to zero).
    * @param {string} selectedMode - "draw" or "guess"
-   * Resets all round/score state.
+   * Resets all round/score state and (for 'guess' mode) resets cycling index.
    */
   const startNewGame = async (selectedMode = 'draw') => {
     setMode(selectedMode);
@@ -113,6 +114,10 @@ function App() {
     setResult(null);
     setError('');
     setModalOpen(false);
+
+    if (selectedMode === 'guess') {
+      guessImageIndex.current = 0; // always start at first image
+    }
 
     // Fetch appropriate initial item for the selected mode
     setLoading(true);
@@ -123,8 +128,7 @@ function App() {
         setCurrentDrawing(null);
       } else {
         const { word, drawingData } = await fetchRandomDrawing();
-        setCurrentWord(word); // For validation
-        // Defensive: Fallback to empty string if drawingData is somehow missing.
+        setCurrentWord(word);
         setCurrentDrawing(drawingData && typeof drawingData === "string" ? drawingData : "");
       }
     } catch (err) {
@@ -153,7 +157,7 @@ function App() {
     setModalOpen(true);
   };
 
-  // Placeholder: main UI structure
+  // Main UI
   return (
     <div className="App">
       <header className="App-header">
@@ -231,7 +235,6 @@ function App() {
               alignItems: "center"
             }}>
               {/* Drawing Display (guess mode) */}
-              {console.log("[DEBUG-App] Guess mode render:", {currentDrawing, currentWord, round, loading, error})}
               <DrawingDisplay
                 drawingData={currentDrawing}
                 width={340}
@@ -291,7 +294,6 @@ function App() {
                   ? "The app thinks it knows what you drew! 🎉"
                   : "Hmm, the app couldn't recognize your drawing this time.";
                 handleRoundEnd(isCorrect, feedbackMsg, currentWord);
-                // Optionally: clear or keep drawing until next round.
               }
               // Guess Mode Submission Logic
               else {
@@ -304,7 +306,7 @@ function App() {
                 setError(""); // Clear any previous error
 
                 // === MVP logic: compare guess to answer (case insensitive) ===
-                // For now, currentWord is always the answer (from stub)
+                // For now, currentWord is always the answer (from cycling image list)
                 const answer = currentWord || "apple"; // fallback for total stub
                 const isCorrect = trimmedGuess.toLowerCase() === answer.toLowerCase();
                 const feedbackMsg = isCorrect
