@@ -223,3 +223,59 @@
     font-size: 12px;
   }
 }
+
+/* InputArea (word prompt, guess input, submit btn) */
+.input-area {
+  width: 100%;
+  max-width: 400px;
+  margin: 0 auto;
+  background: var(--bg-secondary);
+  border-radius: 16px;
+  box-shadow: 0 1px 6px rgba(41,128,185,0.05);
+  border: 1.5px solid var(--border-color);
+  padding: 18px 18px 14px 18px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.input-area input[type="text"] {
+  width: 100%;
+  padding: 12px 14px;
+  font-size: 1.08rem;
+  border: 1.5px solid var(--border-color);
+  border-radius: 7px;
+  outline: none;
+  margin-bottom: 0;
+  background: #fff;
+  color: var(--text-primary);
+  box-sizing: border-box;
+  transition: border 0.18s;
+}
+
+.input-area input[type="text"]:focus {
+  border: 1.5px solid var(--accent);
+}
+
+.input-area button[disabled], .btn:disabled {
+  opacity: 0.56;
+  cursor: not-allowed;
+}
+
+/* Accessibility/contrast tweaks for labels/prompts */
+.input-area label,
+.input-area .prompt {
+  color: var(--primary);
+  font-weight: 600;
+  margin-bottom: 4px;
+  font-size: 1.09rem;
+}
+
+/* Responsive positioning for mobile */
+@media (max-width: 460px) {
+  .input-area {
+    padding: 14px 5px 12px 5px;
+    font-size: 0.99rem;
+  }
+}

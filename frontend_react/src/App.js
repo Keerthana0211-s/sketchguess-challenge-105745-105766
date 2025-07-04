@@ -25,11 +25,18 @@ function App() {
   // Game data
   const [currentWord, setCurrentWord] = useState('');           // word to draw, or correct answer for guess mode
   const [currentDrawing, setCurrentDrawing] = useState(null);   // drawing data (imageURL or base64)
+  // Word/guess input field: only used in guess mode
+  const [guessInput, setGuessInput] = useState("");
 
   // Effect to enforce chosen theme on document
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
   }, [theme]);
+
+  // Reset guess input when mode changes or modal opens for new round
+  useEffect(() => {
+    setGuessInput("");
+  }, [mode, round]);
 
   // PUBLIC_INTERFACE
   /**
@@ -148,11 +155,113 @@ function App() {
           )}
         </section>
 
-        {/* TODO: Insert InputArea (prompt, input, submit button) */}
+        {/* InputArea: Prompt/guess input or display word to draw */}
         <section style={{ marginTop: 30 }}>
-          <div>
-            <span style={{ color: '#ccc' }}>[Input area placeholder]</span>
-          </div>
+          <form
+            className="input-area"
+            aria-label={mode === "draw" ? "Prompt to draw and submit button" : "Guess input and submit button"}
+            style={{
+              maxWidth: 400,
+              margin: "0 auto",
+              background: "var(--bg-secondary)",
+              borderRadius: 16,
+              boxShadow: "0 1px 6px rgba(41,128,185,0.05)",
+              padding: "18px 18px 14px 18px",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              gap: 10,
+              border: "1.5px solid var(--border-color)"
+            }}
+            onSubmit={e => {
+              e.preventDefault();
+              if (mode === "draw") {
+                // Draw mode: submit drawing, only if a word exists & there is a drawing
+                if (!currentWord) { setError("No word to draw!"); return; }
+                if (!currentDrawing) { setError("Please draw something before submitting!"); return; }
+                setError(""); // Clear any previous error
+                // Stub: Assume random correct/incorrect for feedback
+                handleRoundEnd(Math.random() > 0.45, "Feature: App stubs its guess (MVP)", currentWord);
+              } else {
+                // Guess mode: submit a guess
+                if (!guessInput.trim()) { setError("Please enter your guess!"); return; }
+                setError(""); // Clear any previous error
+                // Stub: Basic matching for MVP, word is always "apple"
+                const answer = currentWord || "apple"; // fallback word for stub
+                const correct = guessInput.trim().toLowerCase() === answer.toLowerCase();
+                handleRoundEnd(correct, correct ? "Great guess!" : "Not quite...", answer);
+              }
+            }}
+          >
+            {mode === "draw" ? (
+              <>
+                <div
+                  className="prompt"
+                  style={{
+                    color: "var(--primary)",
+                    fontWeight: 600,
+                    letterSpacing: "0.01em",
+                    fontSize: "1.12rem",
+                    userSelect: "none"
+                  }}
+                  aria-label="Your drawing prompt"
+                >
+                  {currentWord
+                    ? <>Draw: <span style={{ color: "var(--accent)" }}>{currentWord}</span></>
+                    : <span style={{ color: "var(--text-secondary)" }}>Press "Draw Mode" to get a word!</span>
+                  }
+                </div>
+                <button
+                  className="btn"
+                  type="submit"
+                  aria-label="Submit drawing"
+                  style={{ width: "100%", marginTop: 11 }}
+                  disabled={!currentWord || !currentDrawing || loading}
+                >
+                  Submit Drawing
+                </button>
+              </>
+            ) : (
+              <>
+                <label htmlFor="guess-input" style={{ color: "var(--primary)", fontWeight: 600, marginBottom: 4 }}>
+                  Your Guess:
+                </label>
+                <input
+                  id="guess-input"
+                  name="guess"
+                  type="text"
+                  autoComplete="off"
+                  value={guessInput}
+                  onChange={e => setGuessInput(e.target.value)}
+                  aria-label="Enter your guess"
+                  placeholder="Type the word..."
+                  style={{
+                    width: "100%",
+                    padding: "12px 14px",
+                    fontSize: "1.08rem",
+                    border: "1.5px solid var(--border-color)",
+                    borderRadius: 7,
+                    outline: "none",
+                    marginBottom: 0,
+                    background: "#fff",
+                    color: "var(--text-primary)",
+                    boxSizing: "border-box"
+                  }}
+                  autoFocus
+                  required
+                />
+                <button
+                  className="btn"
+                  type="submit"
+                  aria-label="Submit guess"
+                  style={{ width: "100%", marginTop: 7 }}
+                  disabled={!guessInput.trim() || loading}
+                >
+                  Submit Guess
+                </button>
+              </>
+            )}
+          </form>
         </section>
       </main>
 
