@@ -95,8 +95,21 @@ function App() {
   const fetchRandomDrawing = async () => {
     await new Promise(resolve => setTimeout(resolve, 200 + Math.random() * 200));
     const arr = mockGuessDrawings.current;
+    if (!Array.isArray(arr) || arr.length === 0) {
+      if (window && window.console)
+        window.console.warn("[App] Empty mockGuessDrawings array, cannot fetch drawing");
+      return { word: "", drawingData: "" };
+    }
     const idx = guessImageIndex.current % arr.length;
     const selected = arr[idx];
+
+    if (window && window.console) {
+      window.console.log(
+        "[App-fetchRandomDrawing] Arr length:", arr.length,
+        "idx:", idx, "selected:", selected,
+        "drawingData src:", selected && selected.drawingData
+      );
+    }
     // Advance for next round
     guessImageIndex.current = (guessImageIndex.current + 1) % arr.length;
     return { ...selected };
@@ -250,6 +263,14 @@ function App() {
                   currentWord
                 }}
               />
+              {(!currentDrawing || typeof currentDrawing !== "string") && (
+                <div style={{
+                  color: "#d44", background: "#fffaf9", border: "2px dashed #ed6c02", marginTop: 14,
+                  fontSize: 13, padding: 7, borderRadius: 5
+                }}>
+                  [Debug]: No image asset, empty drawingData or bad type. Please check asset pipeline.
+                </div>
+              )}
             </div>
           )}
         </section>

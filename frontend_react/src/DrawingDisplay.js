@@ -51,30 +51,36 @@ function DrawingDisplay({ drawingData, width = 340, height = 220, debugProps }) 
         alignItems: "center",
         justifyContent: "center",
         background: "var(--bg-secondary)",
-        border: "2.5px solid var(--primary)",
+        border: "4px solid #f39c12", // accent border for debug tracing
         borderRadius: 14,
-        boxShadow: "0 1px 8px rgba(41,128,185,0.08)",
-        position: "relative"
+        boxShadow: "0 1px 8px rgba(41,128,185,0.15)",
+        position: "relative",
+        outline: (isValidImageData(drawingData) ? "2.5px solid #27ae60" : "2.5px dashed #b04141"),
+        boxSizing: "border-box"
       }}
       aria-label={isValidImageData(drawingData) ? "Drawing to guess" : "No drawing available"}
+      data-debug-src={drawingData && typeof drawingData === "string" ? drawingData.slice(0,20)+'...' : "null"}
     >
       {/* On-screen debug info for guess mode */}
       {debugProps && (
         <div style={{
           position: "absolute",
-          left: 8, top: 3, fontSize: 11, color: "#b04", opacity: 0.72,
-          zIndex: 2, fontFamily: "monospace", pointerEvents: "none", maxWidth: 300, wordBreak: "break-word", lineHeight: 1.12
+          left: 8, top: 3, fontSize: 12, color: "#b04", opacity: 0.87,
+          zIndex: 3, fontFamily: "monospace", pointerEvents: "none", maxWidth: 420, wordBreak: "break-word", lineHeight: 1.14,
+          background: "#fffbe8", border: "1.5px solid #f39c12", borderRadius: 3, padding: 6
         }}>
-          <div style={{fontWeight:700}}>DEBUG</div>
+          <div style={{fontWeight:900, fontSize:13, color:"#e87a41"}}>DEBUG</div>
           round: {debugProps.round} <br/>
           loading: {debugProps.loading ? "T" : "F"} <br/>
           error: {debugProps.error ? debugProps.error : "-"} <br/>
-          currentDrawing {debugProps.currentDrawing ?
-            `[len: ${debugProps.currentDrawing.length}]` : "null/empty"} <br/>
-          currentWord: {String(debugProps.currentWord)}<br />
-          validImg: {isValidImageData(debugProps.currentDrawing) ? "yes" : "no"} <br/>
+          drawingData: {typeof drawingData === "string" ? `[${drawingData.slice(0,32)}${drawingData.length>32?"...":""}]` : String(drawingData)} <br/>
+          currentDrawing: {debugProps.currentDrawing && typeof debugProps.currentDrawing === "string"
+            ? `[len:${debugProps.currentDrawing.length}]`
+            : String(debugProps.currentDrawing)} <br/>
+          currentWord: {String(debugProps.currentWord)} <br/>
+          validImg: {isValidImageData(drawingData) ? "yes" : "no"} <br/>
           <span style={{fontSize:10, color:"#630"}}>
-            img src: {typeof debugProps.currentDrawing === "string" ? debugProps.currentDrawing : "(not a string)"}
+            img src: {typeof drawingData === "string" ? drawingData : "(not a string)"}
           </span>
         </div>
       )}
@@ -83,17 +89,31 @@ function DrawingDisplay({ drawingData, width = 340, height = 220, debugProps }) 
           <img
             src={drawingData}
             alt="Drawing to guess"
+            data-debug="guess-image"
             style={{
               width: "96%",
               height: "96%",
               objectFit: "contain",
-              borderRadius: 9,
-              boxShadow: "0 0.5px 4px rgba(41,128,185,0.06)",
-              zIndex: 1
+              borderRadius: 11,
+              boxShadow: "0 0.5px 8px 2px #f39c12, 0 0.5px 4px rgba(41,128,185,0.10)", // shadow for visibility
+              zIndex: 2,
+              outline: "2.5px solid #27ae60"
+            }}
+            onError={e => {
+              e.target.style.opacity = 0.39;
+              e.target.style.border = "2.5px dashed #e74c3c";
+              e.target.alt = "Image failed to load";
+              e.target.parentNode && (e.target.parentNode.style.background="#fff4f3");
+              if (window && window.console) window.console.error("[DrawingDisplay] Failed image load", drawingData);
             }}
           />
-          <div style={{ fontSize: 11, marginTop: 4, color: "#741", wordBreak: "break-all", opacity: 0.78 }}>
-            <strong>src:</strong> {typeof drawingData === "string" ? drawingData : "(not a string)"}
+          <div style={{ fontSize: 12, marginTop: 6, color: "#ad730a", wordBreak: "break-all", opacity: 0.92 }}>
+            <strong>src:</strong>{" "}
+            <span style={{color:"#2980b9"}}>
+              {typeof drawingData === "string"
+                ? drawingData.slice(0, 128) + (drawingData.length > 128 ? "..." : "")
+                : "(not a string)"}
+            </span>
             <br />
             <span>valid: {isValidImageData(drawingData) ? "yes" : "no"}</span>
           </div>
