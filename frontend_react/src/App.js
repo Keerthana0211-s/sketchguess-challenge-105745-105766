@@ -11,6 +11,7 @@ import img3 from './assets/20250704_084812_Screenshot_2025-07-04_at_2.16.47_PM.p
 import img4 from './assets/20250704_084813_Screenshot_2025-07-04_at_2.14.38_PM.png';
 import img5 from './assets/20250704_084813_bear.png';
 import img6 from './assets/20250704_085053_Screenshot_2025-07-04_at_2.20.45_PM.png';
+import imgHelicopter from './assets/20250704_085907_Screenshot_2025-07-04_at_2.17.38_PM.png';
 
 // PUBLIC_INTERFACE
 /**
@@ -34,7 +35,9 @@ function App() {
 
   // === Guess mode mock image array/cycling logic ===
   // List of imported images and associated words for stub guess mode. Edit words if you wish.
+  // Insert new helicopter image as the first item to guarantee it's the first drawing in guess mode.
   const mockGuessDrawings = useRef([
+    { word: 'helicopter', drawingData: imgHelicopter },
     { word: 'lion', drawingData: img1 },
     { word: 'tiger', drawingData: img2 },
     { word: 'house', drawingData: img3 },
