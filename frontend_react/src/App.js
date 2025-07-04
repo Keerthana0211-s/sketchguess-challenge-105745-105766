@@ -37,7 +37,10 @@ function App() {
   // List of imported images and associated words for guess mode.
   // The helicopter image is always the first shown in guess mode, so it is easy to check.
   const mockGuessDrawings = useRef([
-    { word: 'helicopter', drawingData: imgHelicopter }, // This is the new helicopter image and correct answer
+    // Only include helicopter if file is not a corrupt stub (heuristic: length > 100 for valid React/Webpack PNG)
+    ...(typeof imgHelicopter === "string" && imgHelicopter.length > 100
+      ? [{ word: 'helicopter', drawingData: imgHelicopter }]
+      : []),
     { word: 'lion', drawingData: img1 },
     { word: 'tiger', drawingData: img2 },
     { word: 'house', drawingData: img3 },
