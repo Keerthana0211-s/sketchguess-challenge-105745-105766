@@ -12,12 +12,18 @@ import React from "react";
  *   width: number                // Pixel width (optional, default 340)
  *   height: number               // Pixel height (optional, default 220)
  */
-function DrawingDisplay({ drawingData, width = 340, height = 220 }) {
+function DrawingDisplay({ drawingData, width = 340, height = 220, debugProps }) {
   // Helper: Interpret when data may be present but invalid (empty string, wrong format, etc.)
   const isValidImageData = (data) =>
     typeof data === "string" &&
     data.startsWith("data:image") &&
     data.length > "data:image/png;base64,".length + 10; // crude size check
+
+  // Dev: print/log all critical info each render to console and visually (in guess mode)
+  console.log("[DEBUG-DrawingDisplay] drawingData snippet:", drawingData ? drawingData.substring(0, 48)+"..." : drawingData, 
+    "type:", typeof drawingData,
+    "valid:", isValidImageData(drawingData),
+    "extra debugProps:", debugProps);
 
   return (
     <div
@@ -33,10 +39,28 @@ function DrawingDisplay({ drawingData, width = 340, height = 220 }) {
         background: "var(--bg-secondary)",
         border: "2.5px solid var(--primary)",
         borderRadius: 14,
-        boxShadow: "0 1px 8px rgba(41,128,185,0.08)"
+        boxShadow: "0 1px 8px rgba(41,128,185,0.08)",
+        position: "relative"
       }}
       aria-label={isValidImageData(drawingData) ? "Drawing to guess" : "No drawing available"}
     >
+      {/* On-screen debug info for guess mode */}
+      {debugProps && (
+        <div style={{
+          position: "absolute",
+          left: 8, top: 3, fontSize: 11, color: "#b04", opacity: 0.72,
+          zIndex: 2, fontFamily: "monospace", pointerEvents: "none", maxWidth: 260, wordBreak: "break-word"
+        }}>
+          <div style={{fontWeight:700}}>DEBUG</div>
+          round: {debugProps.round} <br/>
+          loading: {debugProps.loading ? "T" : "F"} <br/>
+          error: {debugProps.error ? debugProps.error : "-"} <br/>
+          currentDrawing {debugProps.currentDrawing ? 
+            `[len: ${debugProps.currentDrawing.length}]` : "null/empty"} <br/>
+          currentWord: {String(debugProps.currentWord)}<br />
+          validImg: {isValidImageData(debugProps.currentDrawing) ? "yes" : "no"}
+        </div>
+      )}
       {isValidImageData(drawingData) ? (
         <img
           src={drawingData}
@@ -46,7 +70,8 @@ function DrawingDisplay({ drawingData, width = 340, height = 220 }) {
             height: "96%",
             objectFit: "contain",
             borderRadius: 9,
-            boxShadow: "0 0.5px 4px rgba(41,128,185,0.06)"
+            boxShadow: "0 0.5px 4px rgba(41,128,185,0.06)",
+            zIndex: 1
           }}
         />
       ) : (

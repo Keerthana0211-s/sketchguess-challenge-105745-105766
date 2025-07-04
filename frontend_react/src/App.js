@@ -95,6 +95,7 @@ function App() {
     ];
     await new Promise(resolve => setTimeout(resolve, 400 + Math.random() * 500));
     const sample = sampleDrawings[Math.floor(Math.random() * sampleDrawings.length)];
+    console.log("[DEBUG-fetchRandomDrawing] Returning sample:", sample);
     return sample;
   };
 
@@ -230,10 +231,19 @@ function App() {
               alignItems: "center"
             }}>
               {/* Drawing Display (guess mode) */}
+              {console.log("[DEBUG-App] Guess mode render:", {currentDrawing, currentWord, round, loading, error})}
               <DrawingDisplay
                 drawingData={currentDrawing}
                 width={340}
                 height={220}
+                // dev prop for inspection
+                debugProps={{
+                  round,
+                  loading,
+                  error,
+                  currentDrawing,
+                  currentWord
+                }}
               />
             </div>
           )}
