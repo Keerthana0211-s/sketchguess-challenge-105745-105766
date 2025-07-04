@@ -242,21 +242,48 @@ function App() {
             }}
             onSubmit={e => {
               e.preventDefault();
+              // Drawing Mode Submission Logic
               if (mode === "draw") {
-                // Draw mode: submit drawing, only if a word exists & there is a drawing
-                if (!currentWord) { setError("No word to draw!"); return; }
-                if (!currentDrawing) { setError("Please draw something before submitting!"); return; }
+                // Ensure a word prompt AND something drawn
+                if (!currentWord) {
+                  setError("No word to draw!");
+                  setResult(null);
+                  return;
+                }
+                if (!currentDrawing) {
+                  setError("Please draw something before submitting!");
+                  setResult(null);
+                  return;
+                }
+                setError(""); // Reset error on valid submit
+
+                // === MVP stub: App "guesses" user's drawing ===
+                // The MVP simulates guessing - future: integrate image recognition/backend
+                const isCorrect = Math.random() > 0.45; // About 55% chance "app" says correct
+                const feedbackMsg = isCorrect
+                  ? "The app thinks it knows what you drew! 🎉"
+                  : "Hmm, the app couldn't recognize your drawing this time.";
+                handleRoundEnd(isCorrect, feedbackMsg, currentWord);
+                // Optionally: clear or keep drawing until next round.
+              }
+              // Guess Mode Submission Logic
+              else {
+                const trimmedGuess = guessInput.trim();
+                if (!trimmedGuess) {
+                  setError("Please enter your guess!");
+                  setResult(null);
+                  return;
+                }
                 setError(""); // Clear any previous error
-                // Stub: Assume random correct/incorrect for feedback
-                handleRoundEnd(Math.random() > 0.45, "Feature: App stubs its guess (MVP)", currentWord);
-              } else {
-                // Guess mode: submit a guess
-                if (!guessInput.trim()) { setError("Please enter your guess!"); return; }
-                setError(""); // Clear any previous error
-                // Stub: Basic matching for MVP, word is always "apple"
-                const answer = currentWord || "apple"; // fallback word for stub
-                const correct = guessInput.trim().toLowerCase() === answer.toLowerCase();
-                handleRoundEnd(correct, correct ? "Great guess!" : "Not quite...", answer);
+
+                // === MVP logic: compare guess to answer (case insensitive) ===
+                // For now, currentWord is always the answer (from stub)
+                const answer = currentWord || "apple"; // fallback for total stub
+                const isCorrect = trimmedGuess.toLowerCase() === answer.toLowerCase();
+                const feedbackMsg = isCorrect
+                  ? "Great guess!"
+                  : "Not quite... Try another drawing!";
+                handleRoundEnd(isCorrect, feedbackMsg, answer);
               }
             }}
           >
