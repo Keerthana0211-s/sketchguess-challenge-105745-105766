@@ -1,13 +1,18 @@
 /* CSS Variables for Theme Management */
 :root {
-  /* Light theme colors */
-  --bg-primary: #ffffff;
+  /* SketchSolo brand light theme */
+  --primary: #2980b9;
+  --secondary: #27ae60;
+  --accent: #f39c12;
+
+  --bg-primary: #fff;
   --bg-secondary: #f8f9fa;
   --text-primary: #282c34;
-  --text-secondary: #61dafb;
-  --border-color: #e9ecef;
-  --button-bg: #007bff;
-  --button-text: #ffffff;
+  --text-secondary: #666;
+  --border-color: #e0e4ea;
+
+  --button-bg: var(--primary);
+  --button-text: #fff;
 }
 
 [data-theme="dark"] {
@@ -42,15 +47,108 @@
 
 .App-header {
   background-color: var(--bg-secondary);
-  min-height: 100vh;
+  width: 100%;
+  padding: 0;
+  box-shadow: 0 2px 12px rgba(41,128,185,0.04);
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
+  align-items: stretch;
+  justify-content: flex-start;
+  font-size: 1.2rem;
   color: var(--text-primary);
-  transition: background-color 0.3s ease;
+  border-bottom: 1px solid var(--border-color);
   position: relative;
+  min-height: unset;
+}
+
+.header-row {
+  width: 100%;
+  max-width: 950px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 24px 30px 10px 30px;
+  gap: 16px;
+  box-sizing: border-box;
+}
+
+.header-title .game-title {
+  margin: 0;
+  font-size: 2.15rem;
+  letter-spacing: 0.04em;
+  font-weight: 700;
+  color: var(--primary);
+  line-height: 1.18;
+  font-family: inherit;
+  user-select: none;
+}
+
+.header-score {
+  display: flex;
+  align-items: baseline;
+  flex-shrink: 0;
+  gap: 32px;
+  margin-left: auto;
+}
+
+.score-label, .score-round {
+  font-size: 1.04rem;
+  color: var(--primary);
+  letter-spacing: 0.01em;
+  margin-left: 0.4em;
+  margin-right: 0.4em;
+  font-weight: 600;
+}
+
+@media (max-width: 600px) {
+  .header-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+    padding: 17px 8px 6px 8px;
+  }
+  .header-score {
+    margin-left: 0;
+    gap: 14px;
+  }
+  .header-title .game-title {
+    font-size: 1.33rem;
+  }
+}
+
+/* Mode switcher styling */
+.mode-switcher {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  width: 100%;
+  max-width: 950px;
+  margin: 0 auto 9px auto;
+  padding-bottom: 5px;
+}
+
+.btn, .btn.active {
+  background-color: var(--primary);
+  color: #fff;
+  outline: none;
+  border: none;
+  border-radius: 20px;
+  font-size: 1rem;
+  padding: 0.54em 1.25em;
+  font-weight: 600;
+  margin: 0;
+  cursor: pointer;
+  box-shadow: 0 1px 8px rgba(41,128,185,0.06);
+  transition: background 0.18s, color 0.18s, box-shadow 0.18s;
+}
+.btn.active, .btn:active {
+  background-color: var(--secondary);
+}
+.btn:hover:not(.active) {
+  background: var(--accent);
+  color: #fff;
+  box-shadow: 0 2px 12px rgba(41,128,185,0.11);
 }
 
 .App-link {

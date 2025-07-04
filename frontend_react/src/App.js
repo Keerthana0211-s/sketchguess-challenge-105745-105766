@@ -63,24 +63,28 @@ function App() {
   return (
     <div className="App">
       <header className="App-header">
-        <button
-          className="theme-toggle"
-          onClick={toggleTheme}
-          aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
-        >
-          {theme === 'light' ? '🌙 Dark' : '☀️ Light'}
-        </button>
-        <h1>SketchSolo</h1>
-        <div style={{ margin: '10px 0 20px' }}>
-          <span>
-            <strong>Score:</strong> {score.correct}/{score.total}
-          </span>
-          <span style={{ marginLeft: 20 }}>
-            <strong>Round:</strong> {round}
-          </span>
+        <div className="header-row">
+          <div className="header-title">
+            <h1 className="game-title">SketchSolo</h1>
+          </div>
+          <div className="header-score">
+            <span className="score-label">
+              <strong>Score:</strong> {score.correct}/{score.total}
+            </span>
+            <span className="score-round">
+              <strong>Round:</strong> {round}
+            </span>
+          </div>
+          <button
+            className="theme-toggle"
+            onClick={toggleTheme}
+            aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
+          >
+            {theme === 'light' ? '🌙 Dark' : '☀️ Light'}
+          </button>
         </div>
         {/* Game mode switcher (draw/guess) */}
-        <div style={{ marginBottom: 16 }}>
+        <div className="mode-switcher">
           <button
             className={mode === 'draw' ? 'btn active' : 'btn'}
             onClick={() => startNewGame('draw')}
@@ -90,7 +94,6 @@ function App() {
           <button
             className={mode === 'guess' ? 'btn active' : 'btn'}
             onClick={() => startNewGame('guess')}
-            style={{ marginLeft: 10 }}
           >
             🤔 Guess Mode
           </button>
