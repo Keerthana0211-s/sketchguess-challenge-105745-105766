@@ -123,7 +123,8 @@ function App() {
       } else {
         const { word, drawingData } = await fetchRandomDrawing();
         setCurrentWord(word); // For validation
-        setCurrentDrawing(drawingData);
+        // Defensive: Fallback to empty string if drawingData is somehow missing.
+        setCurrentDrawing(drawingData && typeof drawingData === "string" ? drawingData : "");
       }
     } catch (err) {
       setError("Failed to fetch data. Please try again.");
@@ -396,7 +397,7 @@ function App() {
             } else {
               const { word, drawingData } = await fetchRandomDrawing();
               setCurrentWord(word);
-              setCurrentDrawing(drawingData);
+              setCurrentDrawing(drawingData && typeof drawingData === "string" ? drawingData : "");
             }
           } catch (err) {
             setError("Failed to fetch next round data.");

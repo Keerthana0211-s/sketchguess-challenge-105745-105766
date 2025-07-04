@@ -13,6 +13,12 @@ import React from "react";
  *   height: number               // Pixel height (optional, default 220)
  */
 function DrawingDisplay({ drawingData, width = 340, height = 220 }) {
+  // Helper: Interpret when data may be present but invalid (empty string, wrong format, etc.)
+  const isValidImageData = (data) =>
+    typeof data === "string" &&
+    data.startsWith("data:image") &&
+    data.length > "data:image/png;base64,".length + 10; // crude size check
+
   return (
     <div
       className="drawing-display-container"
@@ -29,9 +35,9 @@ function DrawingDisplay({ drawingData, width = 340, height = 220 }) {
         borderRadius: 14,
         boxShadow: "0 1px 8px rgba(41,128,185,0.08)"
       }}
-      aria-label={drawingData ? "Drawing to guess" : "No drawing available"}
+      aria-label={isValidImageData(drawingData) ? "Drawing to guess" : "No drawing available"}
     >
-      {drawingData ? (
+      {isValidImageData(drawingData) ? (
         <img
           src={drawingData}
           alt="Drawing to guess"
@@ -52,10 +58,24 @@ function DrawingDisplay({ drawingData, width = 340, height = 220 }) {
             width: "94%",
             userSelect: "none"
           }}
+          data-debug={drawingData === null ? "null" : typeof drawingData + (drawingData ? " | present" : " | empty")}
         >
           <span role="img" aria-label="Empty drawing">🖼️</span>
           <div style={{fontSize: 15, marginTop: 9}}>
-            No drawing available<br/>Start a round to see a drawing!
+            No drawing available<br />
+            {drawingData === "" && <span>(Empty image)</span>}
+            {drawingData && typeof drawingData === "string" && !isValidImageData(drawingData) && (
+              <span style={{color:"#c44"}}>(Invalid image format!)</span>
+            )}
+            <span style={{fontSize: 11, display: "block", marginTop: 3, color: "#aaa"}}>
+              {/* Debug info: if drawingData present, show first N chars */}
+              {drawingData && typeof drawingData === "string"
+                ? "Got data: " + drawingData.substring(0, 24) + (drawingData.length > 24 ? "..." : "")
+                : ""}
+            </span>
+            <span>
+              Start a round to see a drawing!
+            </span>
           </div>
         </div>
       )}
